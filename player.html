@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Player Stats — Pickleball</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="theme-color" content="#33475b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Pickleball" />
+</head>
+<body>
+  <div class="league-banner" id="league-banner"></div>
+  <header class="top-bar"><h1 id="player-title">Player</h1><button id="settings-btn" class="settings-link" title="Change data source">⚙</button></header>
+  <main>
+    <div id="loading" class="loading">Loading…</div>
+
+    <div id="content" style="display: none">
+      <div class="stat-grid">
+        <div class="stat-tile"><div class="value" id="stat-rank">–</div><div class="label">Rank</div></div>
+        <div class="stat-tile"><div class="value" id="stat-elo">–</div><div class="label">Rating</div></div>
+        <div class="stat-tile"><div class="value" id="stat-record">–</div><div class="label">W-L</div></div>
+        <div class="stat-tile"><div class="value" id="stat-winpct">–</div><div class="label">Win %</div></div>
+      </div>
+
+      <div class="profile-breakdown">
+        <div class="breakdown-card"><span class="breakdown-label">Confidence</span><strong id="stat-confidence">–</strong></div>
+        <div class="breakdown-card"><span class="breakdown-label">Singles</span><strong id="stat-singles">–</strong></div>
+        <div class="breakdown-card"><span class="breakdown-label">Doubles</span><strong id="stat-doubles">–</strong></div>
+      </div>
+
+      <h2>Rating History</h2>
+      <div id="elo-chart-empty" class="empty-state" style="display: none">
+        Log a few more games to see a trend.
+      </div>
+      <div id="elo-chart-card" class="chart-card" style="display: none">
+        <div class="elo-chart-wrap">
+          <svg id="elo-chart" viewBox="0 0 600 220" role="img" aria-label="League rating over time"></svg>
+          <div id="elo-tooltip" class="elo-tooltip" style="display: none">
+            <div class="elo-tooltip-value" id="elo-tooltip-value"></div>
+            <div class="elo-tooltip-date" id="elo-tooltip-date"></div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Head-to-Head</h2>
+      <div id="h2h-empty" class="empty-state" style="display: none">No games logged yet.</div>
+      <table id="h2h-table" style="display: none">
+        <thead>
+          <tr><th>Opponent</th><th>W</th><th>L</th></tr>
+        </thead>
+        <tbody id="h2h-body"></tbody>
+      </table>
+
+      <h2>Game Log</h2>
+      <div id="games-empty" class="empty-state" style="display: none">No games logged yet.</div>
+      <table id="games-table" style="display: none">
+        <thead>
+          <tr><th>Date</th><th>Opponent(s)</th><th>Score</th><th>Impact</th><th>Rating</th></tr>
+        </thead>
+        <tbody id="games-body"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <nav class="tab-bar">
+    <a href="index.html">
+      <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M17 5h2a2 2 0 0 1-2 2M7 5H5a2 2 0 0 0 2 2M7 3h10v6a5 5 0 0 1-10 0V3Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Leaderboard
+    </a>
+    <a href="log-game.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/></svg>
+      Log Game
+    </a>
+    <a href="history.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      History
+    </a>
+    <a href="players.html">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3-6 7-6s7 2.7 7 6M16 8a3 3 0 1 0 0-6M22 20c0-2.7-2-5-5-5.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Players
+    </a>
+  </nav>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/player.js"></script>
+</body>
+</html>

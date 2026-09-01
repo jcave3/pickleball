@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Settings — Pickleball</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="theme-color" content="#33475b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Pickleball" />
+</head>
+<body>
+  <div class="league-banner" id="league-banner"></div>
+  <header class="top-bar"><h1>Settings</h1></header>
+  <main>
+    <div id="welcome-note" class="status" style="display: none">
+      Welcome! Before you can use this site, point it at your league's
+      Google Sheet by pasting the Apps Script Web App URL below.
+    </div>
+
+    <h2>Data source</h2>
+    <p class="field-help">
+      The Apps Script Web App URL for your league's Google Sheet
+      (<strong>Deploy &gt; Manage deployments</strong> &gt; copy the URL
+      ending in <code>/exec</code>).
+    </p>
+    <input type="text" id="api-url" placeholder="https://script.google.com/macros/s/.../exec" />
+    <div id="api-status" class="status" style="display: none"></div>
+    <div class="button-row">
+      <button type="button" class="btn" id="save-api-btn">Save</button>
+      <button type="button" class="btn secondary" id="clear-api-btn">Clear</button>
+    </div>
+    <button type="button" class="btn secondary" id="fix-setup-btn" style="display: none">
+      Try to fix Sheet setup automatically
+    </button>
+    <div id="continue-row" style="display: none">
+      <a class="btn" id="continue-link" href="index.html">Continue</a>
+    </div>
+
+    <h2>Admin passcode</h2>
+    <p class="field-help">
+      Unlocks league management on this browser. The passcode is still
+      validated by Apps Script for every change.
+    </p>
+    <input type="password" id="passcode-input" placeholder="Admin passcode" autocomplete="off" />
+    <div id="passcode-status" class="field-help"></div>
+    <div class="button-row">
+      <button type="button" class="btn" id="save-passcode-btn">Save</button>
+      <button type="button" class="btn secondary" id="forget-passcode-btn">Forget</button>
+    </div>
+
+
+    <h2>Rating model</h2>
+    <p class="field-help">
+      Rebuild every player's rating from the complete game history using the current global model.
+      Run this once after deploying a rating-algorithm update. Requires the admin passcode above.
+    </p>
+    <div id="recompute-status" class="status" style="display:none"></div>
+    <button type="button" class="btn secondary" id="recompute-btn">Recalculate ratings</button>
+
+    <h2>League name</h2>
+    <p class="field-help">
+      Shown in the banner at the top of every page. Saved to your Google
+      Sheet's Apps Script project, so it's the same for everyone —
+      not just this browser. Requires the admin passcode above.
+    </p>
+    <input type="text" id="league-name-input" placeholder="e.g. FreightWise Pickleball League" />
+    <div id="league-name-status" class="status" style="display: none"></div>
+    <button type="button" class="btn" id="save-league-name-btn">Save</button>
+  </main>
+
+  <nav class="tab-bar">
+    <a href="index.html">
+      <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M17 5h2a2 2 0 0 1-2 2M7 5H5a2 2 0 0 0 2 2M7 3h10v6a5 5 0 0 1-10 0V3Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Leaderboard
+    </a>
+    <a href="log-game.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/></svg>
+      Log Game
+    </a>
+    <a href="history.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      History
+    </a>
+    <a href="players.html">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3-6 7-6s7 2.7 7 6M16 8a3 3 0 1 0 0-6M22 20c0-2.7-2-5-5-5.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Players
+    </a>
+  </nav>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

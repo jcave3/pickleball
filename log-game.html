@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Log Game — Pickleball</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="theme-color" content="#33475b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Pickleball" />
+</head>
+<body>
+  <div class="league-banner" id="league-banner"></div>
+  <header class="top-bar"><h1>Log a Game</h1><button id="settings-btn" class="settings-link" title="Change data source">⚙</button></header>
+  <main>
+    <section class="admin-required-card locked-only">
+      <div class="admin-required-icon">🔒</div>
+      <h2>Admin Mode required</h2>
+      <p>Unlock this browser to log games and manage the league.</p>
+      <button type="button" class="btn" id="unlock-log-game">Unlock Admin Mode</button>
+    </section>
+
+    <div id="empty-state" class="empty-state" style="display: none">
+      Need at least 2 active players to log a game —
+      <a class="player-link" href="players.html">add some on the Players page</a>.
+    </div>
+
+    <div id="log-game-form" class="admin-only-section">
+      <div class="toggle-group" id="format-toggle">
+        <button type="button" class="active" data-format="Singles">Singles</button>
+        <button type="button" data-format="Doubles">Doubles</button>
+      </div>
+
+      <div id="balance-panel" class="balance-panel" style="display:none">
+        <button type="button" class="btn secondary" id="balance-btn">⚖️ Balance These 4 Players</button>
+        <div id="balance-result" class="balance-result" style="display:none"></div>
+      </div>
+
+      <label>Side A</label>
+      <select id="a1"></select>
+      <select id="a2" style="display:none; margin-top:8px"></select>
+
+      <label>Side B</label>
+      <select id="b1"></select>
+      <select id="b2" style="display:none; margin-top:8px"></select>
+
+      <div class="score-row">
+        <div>
+          <label>Score A</label>
+          <input type="number" id="scoreA" min="0" inputmode="numeric" />
+          <div class="preset-row" data-target="scoreA">
+            <button type="button" class="preset-btn" data-value="11">11</button>
+            <button type="button" class="preset-btn" data-value="15">15</button>
+            <button type="button" class="preset-btn" data-value="21">21</button>
+          </div>
+        </div>
+        <div>
+          <label>Score B</label>
+          <input type="number" id="scoreB" min="0" inputmode="numeric" />
+          <div class="preset-row" data-target="scoreB">
+            <button type="button" class="preset-btn" data-value="11">11</button>
+            <button type="button" class="preset-btn" data-value="15">15</button>
+            <button type="button" class="preset-btn" data-value="21">21</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="primary btn" id="submit-btn">Save Game</button>
+      <div id="status"></div>
+
+      <section id="post-game-panel" class="post-game-panel" style="display:none">
+        <div class="post-game-kicker">Game saved</div>
+        <div id="post-game-summary" class="post-game-summary"></div>
+        <div class="post-game-actions">
+          <button type="button" class="quick-action" id="rematch-btn"><span>↻</span>Rematch</button>
+          <button type="button" class="quick-action" id="swap-sides-btn"><span>⇄</span>Swap sides</button>
+          <button type="button" class="quick-action" id="rebalance-btn"><span>⚖</span>Rebalance</button>
+          <button type="button" class="quick-action danger-action" id="undo-game-btn"><span>↶</span>Undo</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="tab-bar">
+    <a href="index.html">
+      <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M17 5h2a2 2 0 0 1-2 2M7 5H5a2 2 0 0 0 2 2M7 3h10v6a5 5 0 0 1-10 0V3Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Leaderboard
+    </a>
+    <a href="log-game.html" class="active">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/></svg>
+      Log Game
+    </a>
+    <a href="history.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      History
+    </a>
+    <a href="players.html">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3-6 7-6s7 2.7 7 6M16 8a3 3 0 1 0 0-6M22 20c0-2.7-2-5-5-5.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Players
+    </a>
+  </nav>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/log-game.js"></script>
+</body>
+</html>

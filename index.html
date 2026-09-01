@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Pickleball Leaderboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="theme-color" content="#33475b" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Pickleball" />
+</head>
+<body class="leaderboard-page">
+  <div class="league-banner" id="league-banner"></div>
+  <header class="top-bar"><h1>Leaderboard</h1><button id="settings-btn" class="settings-link" title="Change data source">⚙</button></header>
+  <main>
+    <div id="loading" class="loading">Loading…</div>
+    <table id="leaderboard-table" style="display: none">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Rating</th>
+          <th>Record</th>
+          <th class="desktop-only numeric-column">Win %</th>
+          <th class="desktop-only">Confidence</th>
+          <th class="desktop-only numeric-column">Games</th>
+          <th class="desktop-only">Singles Record</th>
+          <th class="desktop-only">Doubles Record</th>
+          <th class="desktop-only">Recent Form</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboard-body"></tbody>
+    </table>
+    <section id="calibration-section" class="calibration-section" style="display:none">
+      <div class="section-heading-row">
+        <div>
+          <h2>Recommended Singles</h2>
+          <p class="section-subtitle">The matches that would teach the rating model the most right now.</p>
+        </div>
+        <div class="confidence-pill" id="league-confidence"></div>
+      </div>
+      <div id="calibration-list" class="calibration-list"></div>
+    </section>
+
+    <button type="button" class="btn secondary" id="export-btn" style="display: none">Export CSV</button>
+  </main>
+
+  <nav class="tab-bar">
+    <a href="index.html" class="active">
+      <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M17 5h2a2 2 0 0 1-2 2M7 5H5a2 2 0 0 0 2 2M7 3h10v6a5 5 0 0 1-10 0V3Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Leaderboard
+    </a>
+    <a href="log-game.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/></svg>
+      Log Game
+    </a>
+    <a href="history.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      History
+    </a>
+    <a href="players.html">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3-6 7-6s7 2.7 7 6M16 8a3 3 0 1 0 0-6M22 20c0-2.7-2-5-5-5.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Players
+    </a>
+  </nav>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/csv.js"></script>
+  <script src="js/leaderboard.js"></script>
+</body>
+</html>
