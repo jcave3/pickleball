@@ -1,2 +1,3 @@
 *.md
 /.sf
+.DS_Store
