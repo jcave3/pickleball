@@ -39,6 +39,10 @@ var SCORE_WEIGHT_MAX = 1.28;
 var PROVISIONAL_MIN_GAMES = 8;
 var PROVISIONAL_MIN_CONFIDENCE = 55;
 
+// How many singles matchups the leaderboard suggests. Every unarchived pair is
+// scored, so this is purely a display cap on an already-ranked list.
+var CALIBRATION_RECOMMENDATION_COUNT = 6;
+
 // The exact header row each tab must have (see the top-of-file comment).
 // Checked on every read, not just at setup time — a sheet reader zips these
 // header cells with row values by position, so a typo'd or missing header
@@ -753,7 +757,7 @@ function getCalibrationRecommendations() {
 
   recommendations.sort(function (a, b) { return b.PriorityScore - a.PriorityScore; });
   var avgConfidence = enriched.length ? Math.round(enriched.reduce(function (sum, p) { return sum + p.confidence; }, 0) / enriched.length) : 0;
-  return { LeagueConfidence: avgConfidence, recommendations: recommendations.slice(0, 3) };
+  return { LeagueConfidence: avgConfidence, recommendations: recommendations.slice(0, CALIBRATION_RECOMMENDATION_COUNT) };
 }
 
 function recomputeAllStats() {
