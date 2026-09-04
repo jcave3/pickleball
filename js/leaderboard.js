@@ -79,12 +79,12 @@ function provisionalBadgeHtml(p) {
   return p.IsProvisional ? '<span class="provisional-badge">PROVISIONAL</span>' : '';
 }
 
-function mobileConfidenceHtml(p) {
-  return `<div class="rating-meta mobile-only"><span>${p.Confidence || 0}% confidence</span></div>`;
+function confidencePct(p) {
+  return Math.max(0, Math.min(100, Number(p.Confidence) || 0));
 }
 
 function confidenceCellHtml(p) {
-  const value = Math.max(0, Math.min(100, Number(p.Confidence) || 0));
+  const value = confidencePct(p);
   return `<div class="confidence-cell" title="${value}% confidence">
     <span>${value}%</span>
     <span class="confidence-meter" aria-hidden="true"><span style="width:${value}%"></span></span>
@@ -141,50 +141,125 @@ function renderCalibration() {
   section.style.display = 'block';
 }
 
+/* One computed shape per player, so the table row and the mobile card stay in
+   sync and the per-format record scan only runs once per player. */
+function playerView(p, rankedPosition) {
+  return {
+    player: p,
+    rank: p.IsProvisional ? 'P' : rankedPosition,
+    isTop: !p.IsProvisional && rankedPosition === 1,
+    elo: Math.round(p.Elo),
+    record: `${p.Wins}-${p.Losses}`,
+    winPct: Math.round((p.WinPct || 0) * 100),
+    games: p.GamesPlayed || 0,
+    confidence: confidencePct(p),
+    singles: splitRecordText(splitRecordForPlayer(p, 'Singles')),
+    doubles: splitRecordText(splitRecordForPlayer(p, 'Doubles')),
+    profileUrl: `player.html?name=${encodeURIComponent(p.Name)}`,
+  };
+}
+
+function leaderboardRow(v) {
+  const p = v.player;
+  const tr = document.createElement('tr');
+  if (v.isTop) tr.className = 'rank-1';
+  if (p.IsProvisional) tr.classList.add('provisional-row');
+  tr.innerHTML = `
+    <td class="rank">${v.rank}</td>
+    <td class="player-column">
+      <a class="player-link" href="${v.profileUrl}">${p.Name}</a>${streakBadgeHtml(p.Streak || 0)}
+      ${provisionalBadgeHtml(p)}
+    </td>
+    <td class="numeric-column"><strong>${v.elo}</strong></td>
+    <td class="record-column">${v.record}</td>
+    <td class="numeric-column">${v.winPct}%</td>
+    <td>${confidenceCellHtml(p)}</td>
+    <td class="numeric-column">${v.games}</td>
+    <td class="record-column">${v.singles}</td>
+    <td class="record-column">${v.doubles}</td>
+    <td>${formDotsHtml(currentGames, p.Name, 'desktop-form')}</td>
+  `;
+  return tr;
+}
+
+/* The mobile view. <details> carries the expand/collapse for free — keyboard,
+   screen-reader state and all — so there is no toggle handler to wire up. The
+   player's name is plain text inside <summary> (a link there would fight the
+   toggle for the tap); the profile link lives in the expanded panel instead. */
+function playerCardHtml(v, isOpen) {
+  const p = v.player;
+  const classes = ['player-card'];
+  if (v.isTop) classes.push('rank-1');
+  if (p.IsProvisional) classes.push('provisional-row');
+  return `<details class="${classes.join(' ')}" data-player="${escapeAttr(p.Name)}"${isOpen ? ' open' : ''}>
+    <summary class="pc-head">
+      <span class="pc-rank">${v.rank}</span>
+      <span class="pc-identity">
+        <span class="pc-name">${p.Name}${streakBadgeHtml(p.Streak || 0)}${provisionalBadgeHtml(p)}</span>
+        <span class="pc-line">
+          <span class="pc-record">${v.record}</span>
+          <span class="pc-sep" aria-hidden="true">·</span>
+          <span>${v.winPct}% won</span>
+          ${formDotsHtml(currentGames, p.Name, 'pc-form')}
+        </span>
+      </span>
+      <span class="pc-rating">
+        <span class="pc-rating-value">${v.elo}</span>
+        <span class="pc-rating-label">rating</span>
+      </span>
+      <svg class="pc-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="pc-body">
+      <div class="pc-stats">
+        <div class="pc-stat"><span class="pc-stat-label">Games</span><span class="pc-stat-value">${v.games}</span></div>
+        <div class="pc-stat"><span class="pc-stat-label">Singles</span><span class="pc-stat-value">${v.singles}</span></div>
+        <div class="pc-stat"><span class="pc-stat-label">Doubles</span><span class="pc-stat-value">${v.doubles}</span></div>
+      </div>
+      <div class="pc-confidence">
+        <span class="pc-stat-label">Confidence</span>
+        <span class="confidence-meter" aria-hidden="true"><span style="width:${v.confidence}%"></span></span>
+        <span class="pc-confidence-value">${v.confidence}%</span>
+      </div>
+      <a class="pc-profile" href="${v.profileUrl}">View profile <span aria-hidden="true">→</span></a>
+    </div>
+  </details>`;
+}
+
+function escapeAttr(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
 async function loadLeaderboard() {
   const loading = document.getElementById('loading');
-  const table = document.getElementById('leaderboard-table');
+  const views = document.getElementById('leaderboard-views');
   const body = document.getElementById('leaderboard-body');
+  const cards = document.getElementById('leaderboard-cards');
   const exportBtn = document.getElementById('export-btn');
 
   loading.className = 'loading';
   loading.textContent = 'Loading…';
   loading.style.display = 'block';
-  table.style.display = 'none';
+  views.hidden = true;
 
   function render() {
     if (!currentLeaderboard.length) return;
     exportBtn.style.display = 'block';
+    // A re-render (cache paint -> fresh data) rebuilds every card, which would
+    // otherwise snap open cards shut under the reader's finger.
+    const expanded = new Set(
+      Array.from(cards.querySelectorAll('details[open]')).map((d) => d.dataset.player)
+    );
     body.innerHTML = '';
+    cards.innerHTML = '';
     let rankedPosition = 0;
     currentLeaderboard.forEach((p) => {
       if (!p.IsProvisional) rankedPosition += 1;
-      const tr = document.createElement('tr');
-      if (!p.IsProvisional && rankedPosition === 1) tr.className = 'rank-1';
-      if (p.IsProvisional) tr.classList.add('provisional-row');
-      const winPct = Math.round((p.WinPct || 0) * 100);
-      const singlesRecord = splitRecordForPlayer(p, 'Singles');
-      const doublesRecord = splitRecordForPlayer(p, 'Doubles');
-      tr.innerHTML = `
-        <td class="rank">${p.IsProvisional ? 'P' : rankedPosition}</td>
-        <td class="player-column">
-          <a class="player-link" href="player.html?name=${encodeURIComponent(p.Name)}">${p.Name}</a>${streakBadgeHtml(p.Streak || 0)}
-          ${provisionalBadgeHtml(p)}
-          ${mobileConfidenceHtml(p)}
-        </td>
-        <td class="numeric-column"><strong>${Math.round(p.Elo)}</strong></td>
-        <td class="record-column">${p.Wins}-${p.Losses}</td>
-        <td class="desktop-only numeric-column">${winPct}%</td>
-        <td class="desktop-only">${confidenceCellHtml(p)}</td>
-        <td class="desktop-only numeric-column">${p.GamesPlayed || 0}</td>
-        <td class="desktop-only record-column">${splitRecordText(singlesRecord)}</td>
-        <td class="desktop-only record-column">${splitRecordText(doublesRecord)}</td>
-        <td class="desktop-only">${formDotsHtml(currentGames, p.Name, 'desktop-form')}</td>
-      `;
-      body.appendChild(tr);
+      const view = playerView(p, rankedPosition);
+      body.appendChild(leaderboardRow(view));
+      cards.insertAdjacentHTML('beforeend', playerCardHtml(view, expanded.has(p.Name)));
     });
     loading.style.display = 'none';
-    table.style.display = 'table';
+    views.hidden = false;
     renderCalibration();
   }
 

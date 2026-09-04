@@ -22,23 +22,28 @@
   <header class="top-bar"><h1>Leaderboard</h1><button id="settings-btn" class="settings-link" title="Change data source">⚙</button></header>
   <main>
     <div id="loading" class="loading">Loading…</div>
-    <table id="leaderboard-table" style="display: none">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Player</th>
-          <th>Rating</th>
-          <th>Record</th>
-          <th class="desktop-only numeric-column">Win %</th>
-          <th class="desktop-only">Confidence</th>
-          <th class="desktop-only numeric-column">Games</th>
-          <th class="desktop-only">Singles Record</th>
-          <th class="desktop-only">Doubles Record</th>
-          <th class="desktop-only">Recent Form</th>
-        </tr>
-      </thead>
-      <tbody id="leaderboard-body"></tbody>
-    </table>
+    <!-- Two views over the same data: the wide table on desktop, an expandable
+         card per player on mobile. CSS picks one; #leaderboard-views gates both. -->
+    <div id="leaderboard-views" hidden>
+      <table id="leaderboard-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Rating</th>
+            <th>Record</th>
+            <th class="numeric-column">Win %</th>
+            <th>Confidence</th>
+            <th class="numeric-column">Games</th>
+            <th>Singles Record</th>
+            <th>Doubles Record</th>
+            <th>Recent Form</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+      <div id="leaderboard-cards" class="player-card-list"></div>
+    </div>
     <section id="calibration-section" class="calibration-section" style="display:none">
       <div class="section-heading-row">
         <div>

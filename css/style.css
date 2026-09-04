@@ -233,8 +233,6 @@ table {
   box-shadow: var(--shadow-sm);
 }
 
-.desktop-only { display: none; }
-
 .numeric-column,
 .record-column {
   white-space: nowrap;
@@ -715,14 +713,6 @@ a.btn {
 
 
 /* Rating confidence + calibration recommendations */
-.rating-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 3px;
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}
 .provisional-badge {
   display: inline-flex;
   align-items: center;
@@ -864,6 +854,189 @@ a.btn {
   font-weight: 750;
 }
 
+/* Leaderboard: mobile player cards
+   The wide table and this card list are two views of the same rows. Below the
+   900px breakpoint the table is hidden entirely and the cards take over, so
+   nothing gets truncated away on a phone — the six columns the table drops are
+   folded into each card's expandable panel instead. */
+.confidence-meter {
+  display: block;
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.confidence-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+#leaderboard-table { display: none; }
+
+.player-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.player-card.rank-1 { border-color: var(--skyway-light); }
+
+.pc-head {
+  display: grid;
+  grid-template-columns: 26px 1fr auto 16px;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  cursor: pointer;
+  list-style: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Suppress the native disclosure triangle; .pc-chevron replaces it. */
+.pc-head::-webkit-details-marker { display: none; }
+.pc-head::marker { content: ''; }
+
+.pc-rank {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.player-card.rank-1 .pc-rank { color: var(--highlight-text); }
+
+.pc-identity { min-width: 0; }
+
+.pc-name {
+  display: block;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.pc-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.pc-record { font-weight: 700; color: var(--text); }
+.pc-sep { color: var(--border); }
+.pc-form { margin-top: 0; margin-left: 2px; }
+
+.pc-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.05;
+}
+
+.pc-rating-value {
+  font-size: 1.32rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+
+.pc-rating-label {
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.pc-chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+
+.player-card[open] .pc-chevron { transform: rotate(180deg); }
+
+.pc-body {
+  padding: 2px 12px 12px;
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
+}
+
+.pc-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pc-stat {
+  background: var(--bg);
+  border-radius: 9px;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.pc-stat-label {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pc-stat-value {
+  display: block;
+  font-size: 0.98rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.pc-confidence {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 9px;
+  margin-top: 11px;
+}
+
+.pc-confidence-value {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.pc-profile {
+  display: block;
+  margin-top: 12px;
+  padding: 9px;
+  border-radius: 9px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-chevron { transition: none; }
+}
+
 @media (min-width: 900px) {
   body { padding-left: 220px; }
 
@@ -925,13 +1098,8 @@ a.btn {
     padding-right: 28px;
   }
 
-  body.leaderboard-page .desktop-only {
-    display: table-cell;
-  }
-
-  body.leaderboard-page .mobile-only {
-    display: none;
-  }
+  #leaderboard-table { display: table; }
+  #leaderboard-cards { display: none; }
 
   body.leaderboard-page #leaderboard-table th,
   body.leaderboard-page #leaderboard-table td {
@@ -954,21 +1122,7 @@ a.btn {
     white-space: nowrap;
   }
 
-  .confidence-meter {
-    display: block;
-    width: 58px;
-    height: 5px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: var(--border);
-  }
-
-  .confidence-meter > span {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: var(--accent);
-  }
+  .confidence-meter { width: 58px; }
 
   .desktop-form {
     margin-top: 0;
