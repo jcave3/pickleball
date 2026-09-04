@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'pickleball-static-v3-brand-1';
+const STATIC_CACHE = 'pickleball-static-v4-mobile-leaderboard-1';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -41,8 +41,19 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET' || url.origin !== self.location.origin) return;
 
+  // `cache: 'no-cache'` forces a conditional request (If-None-Match /
+  // If-Modified-Since) instead of letting the browser's own HTTP cache answer
+  // from its copy. Without it, network-first isn't actually network-first:
+  // fetch() here goes through the same HTTP cache as any other request, and
+  // GitHub Pages serves these assets with `max-age=600`, so a phone can sit on
+  // stale bytes for ten minutes. That's how you get the failure mode this
+  // guards against — index.html and a js/ file change in the same deploy, one
+  // revalidates and the other doesn't, and the new script runs against the old
+  // markup (missing element -> TypeError -> the page renders nothing at all).
+  // The cost is a round trip per asset, but a 304 is empty, and the .catch()
+  // below still falls back to the cache when the network is genuinely gone.
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: 'no-cache' })
       .then((response) => {
         if (response.ok) {
           const copy = response.clone();

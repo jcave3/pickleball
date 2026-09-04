@@ -44,13 +44,23 @@
         <div id="balance-result" class="balance-result" style="display:none"></div>
       </div>
 
-      <label>Side A</label>
-      <select id="a1"></select>
-      <select id="a2" style="display:none; margin-top:8px"></select>
+      <div class="team-slots" id="team-slots">
+        <div class="team-slot">
+          <span class="team-slot-label">Side A</span>
+          <div class="slot-names" id="slot-names-a"></div>
+        </div>
+        <div class="team-slot-vs" aria-hidden="true">vs</div>
+        <div class="team-slot">
+          <span class="team-slot-label">Side B</span>
+          <div class="slot-names" id="slot-names-b"></div>
+        </div>
+      </div>
 
-      <label>Side B</label>
-      <select id="b1"></select>
-      <select id="b2" style="display:none; margin-top:8px"></select>
+      <div class="picker-heading">
+        <span class="picker-hint" id="picker-hint"></span>
+        <button type="button" class="picker-clear" id="clear-players">Clear</button>
+      </div>
+      <div class="player-grid" id="player-grid"></div>
 
       <div class="score-row">
         <div>

@@ -1150,6 +1150,171 @@ a.btn {
   }
 }
 
+/* Log Game: tap-to-select player picker
+   Replaced four native <select>s. On a phone each of those opened an OS picker
+   wheel, so a doubles lineup cost four separate modal interactions; here it's
+   four taps against a roster already sorted most-recently-played-first. */
+.team-slots {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 10px;
+  margin: 16px 0 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.team-slot { min-width: 0; }
+
+.team-slot-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.team-slot-vs {
+  align-self: center;
+  padding-top: 14px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.slot-names {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.slot-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.slot-name.filled {
+  border: 1px solid var(--skyway-light);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.slot-name.empty {
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.slot-remove { color: var(--text-muted); font-weight: 700; }
+
+.picker-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 14px 0 8px;
+}
+
+.picker-hint {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.picker-clear {
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.picker-clear:disabled { opacity: 0.45; }
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.player-chip {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: 7px;
+  /* 44px keeps every chip at the iOS minimum tap target. */
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.player-chip.picked {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.player-chip.is-disabled { opacity: 0.4; }
+
+.chip-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.64rem;
+  font-weight: 800;
+}
+
+.player-chip.picked .chip-slot {
+  background: var(--accent);
+  color: #fff;
+}
+
+.chip-name {
+  font-size: 0.84rem;
+  font-weight: 650;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.player-chip.picked .chip-name { color: var(--accent); }
+
+.chip-elo {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+@media (min-width: 640px) {
+  .player-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 /* Doubles team balancer */
 .balance-panel { margin: -4px 0 8px; }
 .balance-panel .btn { width: 100%; }

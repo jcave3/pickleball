@@ -27,64 +27,98 @@ function predictedProbability(ratingA, ratingB) {
   return 1 / (1 + Math.pow(10, (ratingB - ratingA) / 400));
 }
 
-function setSelectValue(id, value) {
-  const el = document.getElementById(id);
-  if ([...el.options].some((o) => o.value === value)) el.value = value;
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// `slots` is the single source of truth for who is playing. The chip grid
+// writes into it and re-renders from it; nothing mirrors it. Slot order is the
+// order taps land — a1, a2 fill Side A, then b1, b2 fill Side B.
+//
+// This replaced four <select>s, which couldn't represent "nobody picked yet":
+// a <select> always has a value, so every picker silently defaulted to a real
+// player and a forgotten dropdown logged a game against the wrong person.
+const SLOT_IDS_DOUBLES = ['a1', 'a2', 'b1', 'b2'];
+const SLOT_IDS_SINGLES = ['a1', 'b1'];
+let slots = { a1: '', a2: '', b1: '', b2: '' };
+
+function activeSlotIds() {
+  return currentFormat === 'Doubles' ? SLOT_IDS_DOUBLES : SLOT_IDS_SINGLES;
+}
+
+function slotFor(name) {
+  return activeSlotIds().findIndex((id) => slots[id] === name);
+}
+
+function isLineupFull() {
+  return activeSlotIds().every((id) => slots[id]);
+}
+
+// Keeps the {slotId: name} shape its callers already used — the ?a=/?b=
+// prefill link, the team balancer and Swap sides all assign a whole lineup.
 function assignPickerValues(valuesById) {
-  const ids = currentFormat === 'Doubles' ? ['a1', 'a2', 'b1', 'b2'] : ['a1', 'b1'];
-  const used = new Set();
-  ids.forEach((id) => {
-    const el = document.getElementById(id);
-    populateSelect(el, used);
-    const wanted = valuesById[id];
-    if (wanted && [...el.options].some((o) => o.value === wanted)) el.value = wanted;
-    if (el.value) used.add(el.value);
+  activeSlotIds().forEach((id) => {
+    if (id in valuesById) slots[id] = valuesById[id] || '';
   });
+  refreshPickers();
 }
 
-// excludeSet holds names already claimed by an earlier picker in this pass,
-// so each picker's own default only ever lands on a still-available player —
-// this is what stops Side A and Side B defaulting to the same person.
-function populateSelect(select, excludeSet) {
-  const prevValue = select.value;
-  select.innerHTML = '';
-  players
-    .filter((p) => !excludeSet.has(p.Name))
-    .forEach((p) => {
-      const opt = document.createElement('option');
-      opt.value = p.Name;
-      opt.textContent = p.Name;
-      select.appendChild(opt);
-    });
-  if ([...select.options].some((o) => o.value === prevValue)) {
-    select.value = prevValue;
+function togglePlayer(name) {
+  const held = activeSlotIds().find((id) => slots[id] === name);
+  if (held) {
+    slots[held] = '';
+  } else {
+    const empty = activeSlotIds().find((id) => !slots[id]);
+    if (!empty) return;
+    slots[empty] = name;
   }
+  refreshPickers();
+}
+
+function slotNamesHtml(ids) {
+  return ids.map((id) => {
+    const name = slots[id];
+    if (!name) return '<span class="slot-name empty">Tap a player</span>';
+    return `<button type="button" class="slot-name filled" data-clear-slot="${id}" aria-label="Remove ${escapeHtml(name)}">`
+      + `${escapeHtml(name)}<span class="slot-remove" aria-hidden="true">×</span></button>`;
+  }).join('');
 }
 
 function refreshPickers() {
-  const a1 = document.getElementById('a1');
-  const a2 = document.getElementById('a2');
-  const b1 = document.getElementById('b1');
-  const b2 = document.getElementById('b2');
-
   const isDoubles = currentFormat === 'Doubles';
   const balancePanel = document.getElementById('balance-panel');
   if (balancePanel) balancePanel.style.display = isDoubles ? 'block' : 'none';
-  a2.style.display = isDoubles ? 'block' : 'none';
-  b2.style.display = isDoubles ? 'block' : 'none';
+  if (!isDoubles) { slots.a2 = ''; slots.b2 = ''; }
 
-  const activeSelects = isDoubles ? [a1, a2, b1, b2] : [a1, b1];
-  const used = new Set();
-  activeSelects.forEach((sel) => {
-    populateSelect(sel, used);
-    if (sel.value) used.add(sel.value);
-  });
-  if (!isDoubles) {
-    a2.innerHTML = '';
-    b2.innerHTML = '';
-  }
+  document.getElementById('slot-names-a').innerHTML = slotNamesHtml(isDoubles ? ['a1', 'a2'] : ['a1']);
+  document.getElementById('slot-names-b').innerHTML = slotNamesHtml(isDoubles ? ['b1', 'b2'] : ['b1']);
+
+  const full = isLineupFull();
+  document.getElementById('player-grid').innerHTML = players.map((p) => {
+    // Badge the slot the player actually occupies, not their position among
+    // those picked — with a hole in the lineup those two disagree.
+    const index = slotFor(p.Name);
+    const picked = index !== -1;
+    // Once every slot is taken the only useful tap is on someone already in the
+    // lineup, so dim the rest rather than silently swallowing the tap.
+    const disabled = !picked && full;
+    const cls = ['player-chip'];
+    if (picked) cls.push('picked');
+    if (disabled) cls.push('is-disabled');
+    return `<button type="button" class="${cls.join(' ')}" data-player="${escapeHtml(p.Name)}"`
+      + ` aria-pressed="${picked}"${disabled ? ' disabled' : ''}>`
+      + `<span class="chip-slot">${picked ? index + 1 : ''}</span>`
+      + `<span class="chip-name">${escapeHtml(p.Name)}</span>`
+      + `<span class="chip-elo">${Math.round(Number(p.Elo) || 0)}</span>`
+      + '</button>';
+  }).join('');
+
+  const remaining = activeSlotIds().filter((id) => !slots[id]).length;
+  document.getElementById('picker-hint').textContent = remaining === 0
+    ? 'Lineup set — tap a name to swap someone out.'
+    : `Tap ${remaining} more player${remaining === 1 ? '' : 's'}`;
+  document.getElementById('clear-players').disabled = activeSlotIds().every((id) => !slots[id]);
 }
 
 // Sorts the roster by "most recently played with" (derived from game
@@ -120,6 +154,13 @@ async function loadPlayers() {
     form.style.display = hasEnoughPlayers ? 'block' : 'none';
     if (!hasEnoughPlayers) return;
 
+    // A roster refresh (or an undo) can retire someone who is still sitting in
+    // a slot; drop them rather than submitting a name the backend won't find.
+    const rosterNames = new Set(players.map((p) => p.Name));
+    Object.keys(slots).forEach((id) => {
+      if (slots[id] && !rosterNames.has(slots[id])) slots[id] = '';
+    });
+
     refreshPickers();
     if (pendingPrefill) {
       setFormat('Singles');
@@ -135,8 +176,21 @@ document.getElementById('format-toggle').addEventListener('click', (e) => {
   setFormat(btn.dataset.format);
 });
 
-['a1', 'a2', 'b1', 'b2'].forEach((id) => {
-  document.getElementById(id).addEventListener('change', refreshPickers);
+document.getElementById('player-grid').addEventListener('click', (e) => {
+  const btn = e.target.closest('.player-chip');
+  if (btn && !btn.disabled) togglePlayer(btn.dataset.player);
+});
+
+document.getElementById('team-slots').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-clear-slot]');
+  if (!btn) return;
+  slots[btn.dataset.clearSlot] = '';
+  refreshPickers();
+});
+
+document.getElementById('clear-players').addEventListener('click', () => {
+  slots = { a1: '', a2: '', b1: '', b2: '' };
+  refreshPickers();
 });
 
 function syncPresetHighlight(input) {
@@ -159,7 +213,7 @@ document.querySelectorAll('.preset-row').forEach((row) => {
 
 function balanceSelectedPlayers() {
   if (currentFormat !== 'Doubles') return false;
-  const selected = ['a1', 'a2', 'b1', 'b2'].map((id) => document.getElementById(id).value);
+  const selected = SLOT_IDS_DOUBLES.map((id) => slots[id]);
   const resultEl = document.getElementById('balance-result');
   if (selected.some((n) => !n) || new Set(selected).size !== 4) {
     resultEl.className = 'balance-result status error';
@@ -234,13 +288,10 @@ function showPostGamePanel(sideAPlayers, sideBPlayers, scoreA, scoreB, gameId) {
 document.getElementById('rematch-btn').addEventListener('click', clearScoresAndFocus);
 
 document.getElementById('swap-sides-btn').addEventListener('click', () => {
-  const values = {
-    a1: document.getElementById('b1').value,
-    b1: document.getElementById('a1').value,
-  };
+  const values = { a1: slots.b1, b1: slots.a1 };
   if (currentFormat === 'Doubles') {
-    values.a2 = document.getElementById('b2').value;
-    values.b2 = document.getElementById('a2').value;
+    values.a2 = slots.b2;
+    values.b2 = slots.a2;
   }
   assignPickerValues(values);
   clearScoresAndFocus();
@@ -283,12 +334,8 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   statusEl.textContent = '';
 
   const isDoubles = currentFormat === 'Doubles';
-  const sideAPlayers = [document.getElementById('a1').value];
-  const sideBPlayers = [document.getElementById('b1').value];
-  if (isDoubles) {
-    sideAPlayers.push(document.getElementById('a2').value);
-    sideBPlayers.push(document.getElementById('b2').value);
-  }
+  const sideAPlayers = isDoubles ? [slots.a1, slots.a2] : [slots.a1];
+  const sideBPlayers = isDoubles ? [slots.b1, slots.b2] : [slots.b1];
   const scoreA = document.getElementById('scoreA').value;
   const scoreB = document.getElementById('scoreB').value;
 
