@@ -475,12 +475,15 @@ function getPlayerStats(name) {
 
     var won = (onA && g.Winner === 'A') || (onB && g.Winner === 'B');
     var opponents = onA ? sideBNames : sideANames;
+    var mySide = onA ? sideANames : sideBNames;
+    var partner = mySide.filter(function (n) { return n !== name; })[0] || '';
     var myDelta;
     if (onA) myDelta = g.SideA_Player1 === name ? g.EloDeltaA1 : g.EloDeltaA2;
     else myDelta = g.SideB_Player1 === name ? g.EloDeltaB1 : g.EloDeltaB2;
 
     myGames.push({
       GameId: g.GameId, Date: g.Date, Format: g.Format, Opponents: opponents,
+      Partner: partner,
       MyScore: onA ? g.ScoreA : g.ScoreB, OppScore: onA ? g.ScoreB : g.ScoreA,
       Won: won, EloDelta: myDelta
     });
