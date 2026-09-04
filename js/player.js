@@ -168,6 +168,94 @@ function wireEloHover(svg, overlay, crosshair, hoverDot, points, xAt, yAt, n) {
   overlay.addEventListener('pointerleave', leave);
 }
 
+// --- Game log -----------------------------------------------------------
+// Same card language as the History page (winner row first, trophy, score,
+// per-side rating impact) rather than a table, so a game reads the same way
+// on both pages. The one addition here is the running rating after the game,
+// which only makes sense in the context of a single player.
+let playerGames = [];
+let ratingAfterByGameId = {};
+let currentPlayerName = '';
+let gamesFormatFilter = '';
+
+function esc(str) {
+  return String(str).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+function opponentLinks(names) {
+  return names
+    .map((n) => `<a class="player-link" href="player.html?name=${encodeURIComponent(n)}">${esc(n)}</a>`)
+    .join(' / ');
+}
+
+// The player whose page this is renders as plain bold text (linking to the
+// page you're already on is a dead end); a doubles partner still links out.
+// `Partner` is a newer getPlayerStats field — an older deployment omits it,
+// in which case the row just shows this player alone.
+function mySideNames(g) {
+  const self = `<span class="self">${esc(currentPlayerName)}</span>`;
+  return g.Partner ? `${self} / ${opponentLinks([g.Partner])}` : self;
+}
+
+function playerGameCard(g) {
+  const date = new Date(g.Date);
+  const ratingAfter = ratingAfterByGameId[g.GameId];
+
+  const rows = [
+    { names: mySideNames(g), score: g.MyScore, won: g.Won, delta: fmtDelta(g.EloDelta) },
+    { names: opponentLinks(g.Opponents), score: g.OppScore, won: !g.Won, delta: '' },
+  ];
+  rows.sort((a, b) => (b.won === a.won ? 0 : b.won ? 1 : -1)); // winner row first
+
+  const rowsHtml = rows
+    .map(
+      (r) => `
+      <div class="game-row ${r.won ? 'winner' : 'loser'}">
+        <span class="side-names">${r.won ? '<span class="trophy">🏆</span>' : ''}${r.names}</span>
+        <span class="side-score">${r.score}</span>
+        <span class="side-delta">${r.delta}</span>
+      </div>`
+    )
+    .join('');
+
+  return `
+    <div class="game-card">
+      <div class="game-meta">
+        <div class="meta-left">
+          <span>${date.toLocaleDateString()}</span>
+          <span class="badge">${esc(g.Format)}</span>
+        </div>
+        ${ratingAfter === undefined ? '' : `<span class="rating-after">Rating ${Math.round(ratingAfter)}</span>`}
+      </div>
+      ${rowsHtml}
+    </div>`;
+}
+
+function renderGameLog() {
+  const list = document.getElementById('games-list');
+  const empty = document.getElementById('games-empty');
+  const filter = document.getElementById('games-format-filter');
+
+  const filtered = playerGames.filter((g) => !gamesFormatFilter || g.Format === gamesFormatFilter);
+
+  list.innerHTML = filtered.map(playerGameCard).join('');
+  empty.textContent = playerGames.length ? 'No games match.' : 'No games logged yet.';
+  empty.style.display = filtered.length ? 'none' : 'block';
+  filter.style.display = playerGames.length ? 'flex' : 'none';
+}
+
+document.getElementById('games-format-filter').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  gamesFormatFilter = btn.dataset.format;
+  document
+    .querySelectorAll('#games-format-filter button')
+    .forEach((b) => b.classList.toggle('active', b === btn));
+  renderGameLog();
+});
+
 async function loadPlayerStats() {
   const loading = document.getElementById('loading');
   const content = document.getElementById('content');
@@ -181,6 +269,7 @@ async function loadPlayerStats() {
   }
 
   document.getElementById('player-title').textContent = name;
+  currentPlayerName = name;
 
   function render(stats) {
     const p = stats.player;
@@ -217,26 +306,9 @@ async function loadPlayerStats() {
     h2hTable.style.display = stats.headToHead.length ? 'table' : 'none';
     h2hEmpty.style.display = stats.headToHead.length ? 'none' : 'block';
 
-    const gamesBody = document.getElementById('games-body');
-    const gamesTable = document.getElementById('games-table');
-    const gamesEmpty = document.getElementById('games-empty');
-    gamesBody.innerHTML = '';
-    stats.games.forEach((g) => {
-      const tr = document.createElement('tr');
-      const date = new Date(g.Date);
-      const opponents = g.Opponents.join(' / ');
-      const eloAfter = eloAfterByGameId[g.GameId];
-      tr.innerHTML = `
-        <td>${date.toLocaleDateString()}</td>
-        <td>${opponents}${g.Won ? ' 🏆' : ''}</td>
-        <td>${g.MyScore}–${g.OppScore}</td>
-        <td>${fmtDelta(g.EloDelta)}</td>
-        <td>${eloAfter === undefined ? '–' : Math.round(eloAfter)}</td>
-      `;
-      gamesBody.appendChild(tr);
-    });
-    gamesTable.style.display = stats.games.length ? 'table' : 'none';
-    gamesEmpty.style.display = stats.games.length ? 'none' : 'block';
+    playerGames = stats.games;
+    ratingAfterByGameId = eloAfterByGameId;
+    renderGameLog();
 
     loading.style.display = 'none';
     content.style.display = 'block';

@@ -1,25 +1,58 @@
 * { box-sizing: border-box; }
 
 :root {
-  --bg: #f6f7f8;
+  /* FreightWise brand palette — see brand-guidelines.md.
+     Raw brand values first, then the app roles they fill, so a brand refresh
+     is a one-line change here rather than a hunt through the stylesheet. */
+  --midnight: #0E125B;
+  --midnight-light: #1D2277;
+  --moonlight: #F7F9FF;
+  --skyway: #3158CF;
+  --skyway-mid: #6C8CF7;
+  --skyway-light: #B6C7FF;
+  --skyway-mist: #E3E9FF;
+  --momentum: #FE5500;
+  --momentum-mid: #FE8C00;
+  --horizon: #FCB92E;
+  --sunrise: #FADE9F;
+  --sunrise-haze: #F1EEE8;
+  --status-red: #FE3700;
+  --status-green: #009C5B;
+
+  /* App roles. Midnight is the anchor; Skyway and Momentum are accents used
+     deliberately (hierarchy, CTAs, highlights), not spread across surfaces. */
+  --bg: var(--moonlight);
   --surface: #ffffff;
-  --border: #e5e7eb;
-  --text: #1c1e21;
-  --text-muted: #6b7280;
-  --accent: #33475b;
-  --accent-soft: #eef1f4;
-  --success: #1e7e34;
-  --success-bg: #eaf6ec;
-  --danger: #c0392b;
-  --danger-bg: #fdecea;
+  --border: var(--skyway-mist);
+  --text: var(--midnight);
+  --text-muted: #5B6291;
+  --accent: var(--midnight);
+  --accent-soft: var(--skyway-mist);
+  --link: var(--skyway);
+
+  /* Momentum orange is the highlight fill; text on light backgrounds uses the
+     deeper shade because #FE5500 only clears 3.2:1 on white. */
+  --highlight: var(--momentum);
+  --highlight-text: #B23C00;
+
+  /* Status colors: the brand hexes are the fills/dots, the deeper shades carry
+     text, keeping every label at or above 4.5:1. */
+  --success: #007A47;
+  --success-fill: var(--status-green);
+  --success-bg: #E4F6EE;
+  --success-border: #A7DCC5;
+  --danger: #C42700;
+  --danger-fill: var(--status-red);
+  --danger-bg: #FFEDE7;
+
   --radius: 12px;
-  --shadow-sm: 0 1px 2px rgba(18, 32, 47, 0.06);
-  --shadow-md: 0 10px 30px rgba(18, 32, 47, 0.09);
+  --shadow-sm: 0 1px 2px rgba(14, 18, 91, 0.07);
+  --shadow-md: 0 10px 30px rgba(14, 18, 91, 0.10);
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', Helvetica, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 16px;
   background: var(--bg);
   color: var(--text);
@@ -90,7 +123,7 @@ header.top-bar {
 
 .admin-mode-toggle.unlocked {
   background: var(--success-bg);
-  border-color: #b8ddc0;
+  border-color: var(--success-border);
   color: var(--success);
 }
 
@@ -235,7 +268,7 @@ td.rank {
   width: 28px;
 }
 
-tr.rank-1 td.rank { color: var(--accent); }
+tr.rank-1 td.rank { color: var(--highlight-text); }
 
 .streak-badge {
   margin-left: 6px;
@@ -244,7 +277,7 @@ tr.rank-1 td.rank { color: var(--accent); }
   white-space: nowrap;
 }
 
-.streak-badge.win { color: #c2410c; }
+.streak-badge.win { color: var(--highlight-text); }
 .streak-badge.loss { color: var(--text-muted); }
 
 .form-dots {
@@ -260,8 +293,8 @@ tr.rank-1 td.rank { color: var(--accent); }
   background: var(--border);
 }
 
-.form-dot.win { background: var(--success); }
-.form-dot.loss { background: var(--danger); }
+.form-dot.win { background: var(--success-fill); }
+.form-dot.loss { background: var(--danger-fill); }
 
 label {
   display: block;
@@ -309,7 +342,7 @@ select:focus, input:focus {
 .toggle-group button.active {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(14, 18, 91, 0.09);
 }
 
 button.primary, .btn {
@@ -428,6 +461,7 @@ a.btn {
   color: inherit;
   text-decoration: underline;
   text-decoration-style: dotted;
+  text-decoration-color: var(--skyway-light);
   text-underline-offset: 3px;
 }
 
@@ -466,7 +500,7 @@ a.btn {
   border-radius: var(--radius);
   padding: 16px 12px 6px;
   margin: 12px 0 20px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .elo-chart-wrap {
@@ -496,7 +530,7 @@ a.btn {
   border-radius: 8px;
   transform: translate(-50%, -100%) translateY(-8px);
   white-space: nowrap;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 8px rgba(14, 18, 91, 0.28);
   z-index: 5;
 }
 
@@ -616,11 +650,26 @@ a.btn {
   margin-right: 4px;
 }
 
+/* The player whose page you're on — bold, unlinked, since the link would
+   point at the page you're already reading. */
+.game-row .side-names .self {
+  font-weight: 700;
+}
+
+/* Running rating after the game — player-page only; History has no single
+   player to anchor it to. */
+.rating-after {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(14, 18, 91, 0.45);
   align-items: center;
   justify-content: center;
   z-index: 100;
@@ -770,7 +819,7 @@ a.btn {
 .post-game-panel {
   margin-top: 14px;
   padding: 15px;
-  border: 1px solid #b8ddc0;
+  border: 1px solid var(--success-border);
   border-radius: 16px;
   background: var(--success-bg);
 }
@@ -796,7 +845,7 @@ a.btn {
   justify-content: center;
   gap: 3px;
   padding: 7px 3px;
-  border: 1px solid rgba(30, 126, 52, 0.18);
+  border: 1px solid var(--success-border);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.8);
   color: var(--text);
@@ -830,7 +879,7 @@ a.btn {
     gap: 5px;
     border-top: none;
     border-right: 1px solid var(--border);
-    box-shadow: 8px 0 28px rgba(18, 32, 47, 0.05);
+    box-shadow: 8px 0 28px rgba(14, 18, 91, 0.06);
   }
 
   nav.tab-bar::before {
