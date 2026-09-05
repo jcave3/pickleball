@@ -236,8 +236,8 @@ async function loadLeaderboard() {
   const cards = document.getElementById('leaderboard-cards');
   const exportBtn = document.getElementById('export-btn');
 
-  loading.className = 'loading';
-  loading.textContent = 'Loading…';
+  // Leave #loading's markup alone — it holds the skeleton from index.html.
+  // The error/empty branches below overwrite it, which is what clears it.
   loading.style.display = 'block';
   views.hidden = true;
 

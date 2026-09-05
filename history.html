@@ -30,7 +30,36 @@
       <option value="">All players</option>
     </select>
 
-    <div id="loading" class="loading">Loading…</div>
+    <div id="loading" class="loading skeleton-host" role="status" aria-live="polite">
+      <span class="visually-hidden">Loading…</span>
+      <div class="skeleton-wrap" aria-hidden="true">
+        <div class="sk-panel sk-game">
+          <div class="sk-meta"><span class="sk sk-line w-40"></span><span class="sk sk-line" style="width:52px"></span></div>
+          <div class="sk-side"><span class="sk sk-line tall"></span><span class="sk sk-line tall"></span></div>
+          <div class="sk-side"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+        </div>
+        <div class="sk-panel sk-game">
+          <div class="sk-meta"><span class="sk sk-line w-40"></span><span class="sk sk-line" style="width:52px"></span></div>
+          <div class="sk-side"><span class="sk sk-line tall"></span><span class="sk sk-line tall"></span></div>
+          <div class="sk-side"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+        </div>
+        <div class="sk-panel sk-game">
+          <div class="sk-meta"><span class="sk sk-line w-40"></span><span class="sk sk-line" style="width:52px"></span></div>
+          <div class="sk-side"><span class="sk sk-line tall"></span><span class="sk sk-line tall"></span></div>
+          <div class="sk-side"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+        </div>
+        <div class="sk-panel sk-game">
+          <div class="sk-meta"><span class="sk sk-line w-40"></span><span class="sk sk-line" style="width:52px"></span></div>
+          <div class="sk-side"><span class="sk sk-line tall"></span><span class="sk sk-line tall"></span></div>
+          <div class="sk-side"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+        </div>
+        <div class="sk-panel sk-game">
+          <div class="sk-meta"><span class="sk sk-line w-40"></span><span class="sk sk-line" style="width:52px"></span></div>
+          <div class="sk-side"><span class="sk sk-line tall"></span><span class="sk sk-line tall"></span></div>
+          <div class="sk-side"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+        </div>
+      </div>
+    </div>
     <div id="empty-state" class="empty-state" style="display: none">No games match.</div>
     <div id="game-list"></div>
     <button type="button" class="btn secondary" id="export-btn" style="display: none">Export CSV</button>

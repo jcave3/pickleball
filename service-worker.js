@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'pickleball-static-v4-mobile-leaderboard-1';
+const STATIC_CACHE = 'pickleball-static-v5-picker-skeletons-1';
 const STATIC_ASSETS = [
   './',
   './index.html',

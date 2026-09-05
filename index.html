@@ -21,7 +21,41 @@
   <div class="league-banner" id="league-banner"></div>
   <header class="top-bar"><h1>Leaderboard</h1><button id="settings-btn" class="settings-link" title="Change data source">⚙</button></header>
   <main>
-    <div id="loading" class="loading">Loading…</div>
+    <div id="loading" class="loading skeleton-host" role="status" aria-live="polite">
+      <span class="visually-hidden">Loading…</span>
+      <div class="skeleton-wrap" aria-hidden="true">
+        <div class="sk-panel sk-row">
+          <span class="sk sk-dot"></span>
+          <span class="sk-stack"><span class="sk sk-line tall w-70"></span><span class="sk sk-line w-40"></span></span>
+          <span class="sk sk-line tall"></span>
+        </div>
+        <div class="sk-panel sk-row">
+          <span class="sk sk-dot"></span>
+          <span class="sk-stack"><span class="sk sk-line tall w-70"></span><span class="sk sk-line w-40"></span></span>
+          <span class="sk sk-line tall"></span>
+        </div>
+        <div class="sk-panel sk-row">
+          <span class="sk sk-dot"></span>
+          <span class="sk-stack"><span class="sk sk-line tall w-70"></span><span class="sk sk-line w-40"></span></span>
+          <span class="sk sk-line tall"></span>
+        </div>
+        <div class="sk-panel sk-row">
+          <span class="sk sk-dot"></span>
+          <span class="sk-stack"><span class="sk sk-line tall w-70"></span><span class="sk sk-line w-40"></span></span>
+          <span class="sk sk-line tall"></span>
+        </div>
+        <div class="sk-panel sk-row">
+          <span class="sk sk-dot"></span>
+          <span class="sk-stack"><span class="sk sk-line tall w-70"></span><span class="sk sk-line w-40"></span></span>
+          <span class="sk sk-line tall"></span>
+        </div>
+        <div class="sk-panel sk-row">
+          <span class="sk sk-dot"></span>
+          <span class="sk-stack"><span class="sk sk-line tall w-70"></span><span class="sk sk-line w-40"></span></span>
+          <span class="sk sk-line tall"></span>
+        </div>
+      </div>
+    </div>
     <!-- Two views over the same data: the wide table on desktop, an expandable
          card per player on mobile. CSS picks one; #leaderboard-views gates both. -->
     <div id="leaderboard-views" hidden>

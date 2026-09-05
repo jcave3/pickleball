@@ -21,7 +21,30 @@
   <div class="league-banner" id="league-banner"></div>
   <header class="top-bar"><h1 id="player-title">Player</h1><button id="settings-btn" class="settings-link" title="Change data source">⚙</button></header>
   <main>
-    <div id="loading" class="loading">Loading…</div>
+    <div id="loading" class="loading skeleton-host" role="status" aria-live="polite">
+      <span class="visually-hidden">Loading…</span>
+      <div class="skeleton-wrap" aria-hidden="true">
+        <div class="sk-tiles">
+          <div class="sk-panel sk-tile"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+          <div class="sk-panel sk-tile"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+          <div class="sk-panel sk-tile"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+          <div class="sk-panel sk-tile"><span class="sk sk-line"></span><span class="sk sk-line"></span></div>
+        </div>
+        <div class="sk sk-chart"></div>
+        <div class="sk-panel sk-game">
+          <div class="sk-meta"><span class="sk sk-line w-40"></span><span class="sk sk-line" style="width:52px"></span></div>
+          <div class="sk-side"><span class="sk sk-line tall"></span><span class="sk sk-line tall"></span></div>
+        </div>
+        <div class="sk-panel sk-game">
+          <div class="sk-meta"><span class="sk sk-line w-40"></span><span class="sk sk-line" style="width:52px"></span></div>
+          <div class="sk-side"><span class="sk sk-line tall"></span><span class="sk sk-line tall"></span></div>
+        </div>
+        <div class="sk-panel sk-game">
+          <div class="sk-meta"><span class="sk sk-line w-40"></span><span class="sk sk-line" style="width:52px"></span></div>
+          <div class="sk-side"><span class="sk sk-line tall"></span><span class="sk sk-line tall"></span></div>
+        </div>
+      </div>
+    </div>
 
     <div id="content" style="display: none">
       <div class="stat-grid">
